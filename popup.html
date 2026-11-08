@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>W｜マガジン追加サポート</title>
+<style>
+  *{box-sizing:border-box}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Yu Gothic",Meiryo,sans-serif;background:#fff;color:#183047;width:420px;margin:0;padding:17px;font-size:13px}
+  header{display:flex;align-items:center;gap:11px;padding-bottom:15px}
+  header img{width:45px;height:45px;border-radius:10px}
+  h1{font-size:16px;line-height:1.4;margin:0}
+  .subtitle,.hint{font-size:11px;line-height:1.65;color:#5c6b7c}
+  .section{border-top:1px solid #e4eaf1;padding:13px 0 11px}
+  label{display:block;font-weight:700;margin-bottom:7px}
+  input[type=text],input[type=file],select{width:100%;border-radius:8px;margin:0 0 8px}
+  input[type=text],select{border:1px solid #bccbd8;padding:9px 10px;background:white;color:inherit;font-size:13px}
+  input[type=file]{font-size:12px}
+  .small{font-size:11px;color:#5c6b7c;margin:0 0 8px}
+  .actions{display:flex;gap:7px;flex-wrap:wrap}
+  button{border:0;border-radius:8px;background:#17639b;color:white;padding:10px 12px;cursor:pointer;font-weight:700;font-size:12px}
+  button.secondary{color:#205078;background:#e9f1f8}
+  button.danger{background:#ba4651}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .status{margin-top:9px;padding:10px;background:#f1f6fa;border-radius:8px;white-space:pre-wrap;line-height:1.6;font-size:12px}
+  #preview{max-height:137px;overflow:auto;border:1px solid #e0e9f2;padding:9px;border-radius:8px;white-space:pre-wrap;word-break:break-all;line-height:1.5;font-size:11px;color:#46586b}
+  #preview:empty{display:none}
+  .error{color:#b12735!important}
+  .positive{color:#16734c}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  #collectStatus{min-height:28px}
+  #collectStatus.partial{background:#fff5e5;color:#78501a}
+  .muted{font-size:10px;color:#657589;margin:10px 0 0}
+  a{color:#17639b}
+</style>
+</head>
+<body>
+<header>
+<img src="icons/w48.png" alt="W アイコン">
+<div><h1>W｜note マガジン追加サポート</h1><div class="subtitle">非公式ツール・Chrome でログインした状態で使用</div></div>
+</header>
+<div class="section"><label>1. note にログイン</label><p class="small"><a href="https://note.com/" target="_blank" rel="noopener">note.com を開く</a>。お使いのアカウントでログインしてください。パスワード・Cookie は取得しません。</p></div>
+<div class="section">
+<label for="profile">2. 公開記事を取得して CSV を作成（もっとみる自動対応）</label>
+<input id="profile" type="text" placeholder="note ID または https://note.com/ユーザーID" spellcheck="false" autocomplete="off">
+<div class="actions"><button id="collect">記事一覧を取得</button><button id="collectStop" class="secondary">収集を停止</button></div>
+<div class="status" id="collectStatus" aria-live="polite">未収集</div>
+<div class="two" style="margin-top:9px">
+  <div><label for="csvDefault" class="small">作成CSVの初期選択</label><select id="csvDefault"><option value="blank">空欄（選びたい記事に Y）</option><option value="all">すべて Y</option></select></div>
+  <div style="padding-top:20px"><button id="collectDownload" class="secondary" style="width:100%">記事リスト CSV を保存</button></div>
+</div>
+<p class="small">公開プロフィールの「記事一覧」からタイトルとURLを取得します。「もっとみる」を自動でクリックして続きを読み込みます。取得が途中で止まった場合は警告が出ます。CSVをExcelで開いて、追加したい記事の「追加(Y)」欄に Y を記入してください。非公開記事やプロフィールで非表示の記事は取得できない場合があります。</p>
+</div>
+<div class="section">
+<label for="file">3. 対象記事の CSV／URL リストを読み込む</label>
+<input id="file" type="file" accept=".csv,.txt,text/plain,text/csv">
+<p class="small">CSV の「追加(Y)」列に Y を入力した記事のみ読み込みます。旧版の「加入(Y)」列も対応します。TXT は1行につき1記事URLです。</p>
+<label for="order">処理する順序</label>
+<select id="order">
+<option value="list">読み込んだリストの順番</option>
+<option value="chapter">タイトル内の話数が小さい順（第1話→第2話…）</option>
+</select>
+<div id="preview" aria-live="polite"></div>
+</div>
+<div class="section">
+<label for="magazine">4. 追加先のマガジン名</label>
+<input id="magazine" type="text" maxlength="180" placeholder="note に表示される正式なマガジン名">
+<p class="small">同名のマガジンが複数ある場合や確認できない場合は停止します。</p>
+</div>
+<div class="section">
+<label>5. 実行</label>
+<div class="actions">
+<button id="test">まず3件をテスト</button>
+<button id="all" class="secondary">残りを一括追加</button>
+<button id="stop" class="danger">停止</button>
+</div>
+<p class="hint">最初の3件が正しいマガジンへ入ったことを手動で確認してから、一括実行してください。「本＋」ボタンが検出できない場合は、画面の案内に従って対象ボタンを指定します。</p>
+<div id="status" class="status" aria-live="polite">未開始</div>
+<div class="actions" style="margin-top:10px"><button id="download" class="secondary">処理結果を CSV で保存</button></div>
+</div>
+<div class="muted">note 公式とは無関係です。公開記事の表示形式によっては自動処理できません。</div>
+<script src="popup.js"></script>
+</body>
+</html>

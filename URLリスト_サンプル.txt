@@ -1,0 +1,3 @@
+# 1行に1記事のURL（下記は架空のURLです）
+https://note.com/example_id/n/n123456789abc
+https://note.com/example_id/n/n3456789abcde

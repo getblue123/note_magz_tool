@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "W｜note マガジン追加サポート",
+  "short_name": "W マガジン追加",
+  "version": "10.0.0",
+  "description": "「もっとみる」にも対応して note の公開記事を収集し CSV を作成して、選んだ記事をマガジンへ順番に追加する非公式 Chrome 拡張機能です。",
+  "permissions": [
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://note.com/*"
+  ],
+  "icons": {
+    "16": "icons/w16.png",
+    "32": "icons/w32.png",
+    "48": "icons/w48.png",
+    "128": "icons/w128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "W｜マガジン追加サポート",
+    "default_icon": {
+      "16": "icons/w16.png",
+      "32": "icons/w32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://note.com/*/n/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://note.com/*"
+      ],
+      "js": [
+        "collector.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
